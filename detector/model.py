@@ -1,4 +1,8 @@
-from ultralytics import YOLO
+import onnxruntime as ort
 
 def load_model():
-    return YOLO("yolov8n.pt")
+    session = ort.InferenceSession(
+        "yolov8n.onnx",
+        providers=["CPUExecutionProvider"]
+    )
+    return session
