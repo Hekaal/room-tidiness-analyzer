@@ -1,29 +1,31 @@
-ALLOWED_CLASSES = {
-    "backpack", "handbag", "bottle", "cup",
-    "book", "laptop",
-    "chair", "bed", "couch",
-    "person"
-}
+import numpy as np
 
-def detect_objects(model, image):
-    results = model(image, verbose=False)
+def preprocess(img, size=640):
+    img = img.astype(np.float32) / 255.0
+    img = np.transpose(img, (2, 0, 1))
+    img = np.expand_dims(img, axis=0)
+    return img
+
+def detect_objects(session, image_np):
+    inp = preprocess(image_np)
+    outputs = session.run(None, {"images": inp})[0]
+
     detections = []
+    for det in outputs[0]:
+        conf = det[4]
+        if conf < 0.4:
+            continue
 
-    for r in results:
-        for box in r.boxes:
-            cls_id = int(box.cls[0])
-            cls_name = model.names[cls_id]
-            conf = float(box.conf[0])
-
-            if cls_name not in ALLOWED_CLASSES:
-                continue
-
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-
-            detections.append({
-                "class": cls_name,
-                "confidence": conf,
-                "bbox": (x1, y1, x2, y2)
-            })
+        x, y, w, h = det[:4]
+        detections.append({
+            "class": "object",
+            "confidence": float(conf),
+            "bbox": (
+                int(x - w/2),
+                int(y - h/2),
+                int(x + w/2),
+                int(y + h/2)
+            )
+        })
 
     return detections
