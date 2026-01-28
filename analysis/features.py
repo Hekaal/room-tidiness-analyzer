@@ -1,12 +1,13 @@
-import cv2
 import numpy as np
+from skimage.feature import canny
+from skimage.color import rgb2gray
 
 SURFACE_CLASSES = {"bed", "couch", "chair"}
 IGNORE_CLASSES = {"person"}
 
-def extract_features(detections, image):
-    h, w = image.shape[:2]
-    area_img = h * w
+def extract_features(detections, image_np):
+    h, w, _ = image_np.shape
+    img_area = h * w
 
     total_objects = 0
     total_bbox_area = 0
@@ -24,9 +25,10 @@ def extract_features(detections, image):
             continue
 
         x1, y1, x2, y2 = d["bbox"]
-        bbox_area = (x2 - x1) * (y2 - y1)
-        total_bbox_area += bbox_area
+        area = (x2 - x1) * (y2 - y1)
+
         total_objects += 1
+        total_bbox_area += area
 
         center_y = (y1 + y2) / 2
         if center_y >= floor_y:
@@ -37,13 +39,13 @@ def extract_features(detections, image):
                 objects_on_surface += 1
                 break
 
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 100, 200)
-    edge_density = np.sum(edges > 0) / area_img
+    gray = rgb2gray(image_np)
+    edges = canny(gray, sigma=2)
+    edge_density = edges.sum() / img_area
 
     return {
         "total_objects": total_objects,
-        "total_bbox_area_ratio": round(total_bbox_area / area_img, 4),
+        "total_bbox_area_ratio": round(total_bbox_area / img_area, 4),
         "objects_on_floor": objects_on_floor,
         "objects_on_surface": objects_on_surface,
         "edge_density": round(float(edge_density), 4)
