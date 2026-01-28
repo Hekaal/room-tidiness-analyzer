@@ -17,7 +17,7 @@ def compute_tidiness_score(f):
 
     if score >= 71:
         label = "RAPI"
-    elif score >= 31:
+    elif score >= 41:
         label = "SEDANG"
     else:
         label = "BERANTAKAN"
