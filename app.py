@@ -1,3 +1,7 @@
+import sys
+import streamlit as st
+
+st.write("Python version:", sys.version)
 import streamlit as st
 import cv2, numpy as np
 
