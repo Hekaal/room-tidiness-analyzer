@@ -28,6 +28,7 @@ if uploaded:
     result = compute_tidiness_score(features)
 
     vis_img = draw_visuals(pil_img.copy(), detections)
+    st.image(vis_img, use_column_width=True)
 
     st.image(vis_img, use_column_width=True)
     st.metric("Skor Kerapian", result["score"], result["label"])
