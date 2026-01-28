@@ -1,3 +1,4 @@
+# analysis/features.py
 import numpy as np
 from skimage.feature import canny
 from skimage.color import rgb2gray
@@ -49,7 +50,7 @@ def extract_features(detections, image_np):
     gray = rgb2gray(image_np)
     edges = canny(gray, sigma=2)
 
-    floor_mask = np.zeros((h, w), dtype=np.uint8 demonstrate)
+    floor_mask = np.zeros((h, w), dtype=np.uint8)
     floor_mask[floor_y:, :] = 1
 
     floor_edges = edges * floor_mask
@@ -58,11 +59,7 @@ def extract_features(detections, image_np):
     # =========================
     # 3️⃣ FLOOR CLUTTER AREA
     # =========================
-    clutter_pixels = np.logical_and(
-        edges,
-        floor_mask
-    ).sum()
-
+    clutter_pixels = np.logical_and(edges, floor_mask).sum()
     floor_clutter_ratio = clutter_pixels / floor_mask.sum()
 
     # =========================
@@ -77,9 +74,7 @@ def extract_features(detections, image_np):
         "total_bbox_area_ratio": round(total_bbox_area / img_area, 4),
         "objects_on_floor": objects_on_floor,
         "objects_on_surface": objects_on_surface,
-
-        # NEW – lantai
         "floor_edge_density": round(float(floor_edge_density), 4),
         "floor_clutter_ratio": round(float(floor_clutter_ratio), 4),
-        "inferred_floor_clutter": inferred_floor_clutter
+        "inferred_floor_clutter": inferred_floor_clutter,
     }
