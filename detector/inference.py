@@ -1,11 +1,14 @@
 import numpy as np
 from detector.classes import COCO_CLASSES, ALLOWED_CLASSES
 
+from PIL import Image
+
 def preprocess(img, size=640):
-    img = img.astype(np.float32) / 255.0
-    img = np.transpose(img, (2, 0, 1))   # HWC → CHW
-    img = np.expand_dims(img, axis=0)
-    return img
+img = Image.fromarray(img).resize((size, size))
+img = np.array(img).astype(np.float32) / 255.0
+img = np.transpose(img, (2, 0, 1))
+img = np.expand_dims(img, axis=0)
+return
 
 def detect_objects(session, image_np):
     inputs = preprocess(image_np)
