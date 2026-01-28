@@ -1,6 +1,5 @@
 streamlit
-ultralytics
 numpy
-torch
 pillow
 scikit-image
+onnxruntime
